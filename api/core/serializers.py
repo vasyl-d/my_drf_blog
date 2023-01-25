@@ -2,20 +2,6 @@ from rest_framework import serializers
 from .models import Post, Tag, FeedBack, Comment
 from django.contrib.auth.models import User
 
-class PostSerializer(serializers.ModelSerializer):
-
-    author = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
-
-    tags = serializers.SlugRelatedField(slug_field="name", many=True, queryset=Tag.objects.all())
-
-    class Meta:
-        model = Post
-        fields = ("id", "h1", "title", "slug", "description", "content", "image", "created_at", "author", "tags")
-        lookup_field = 'slug'
-        extra_kwargs = {
-            'url': {'lookup_field': 'slug'}
-        }
-
 class TagSerializer(serializers.Serializer):
 
     name = serializers.CharField(max_length=30)
@@ -28,6 +14,22 @@ class TagSerializer(serializers.Serializer):
         extra_kwargs = {
             'url': {'lookup_field': 'name'}
         }
+
+class PostSerializer(serializers.ModelSerializer):
+
+    author = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
+
+    # tags = serializers.SlugRelatedField(slug_field="name", many=True, queryset=Tag.objects.all())
+    tags = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Post
+        fields = ("id", "h1", "title", "slug", "description", "content", "image", "created_at", "author", "tags")
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
+
 
 class FeedBackSerializer(serializers.ModelSerializer):
 

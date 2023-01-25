@@ -111,5 +111,5 @@ class CommentDeleteView(generics.GenericAPIView):
             })
         else:
             return Response({
-                "message": "User dont have rights for deletion",
+                "message": "User hasn't have rights for deletion",
             })
