@@ -8,11 +8,11 @@ from rest_framework.response import Response
 class PageNumberSetPagination(pagination.PageNumberPagination):
     page_size = 6
     page_size_query_param = 'page_size'
-    ordering = 'created_at'
+    ordering = 'id'
 
 class TagViewSet(viewsets.ModelViewSet):
-    serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    serializer_class = TagSerializer
     lookup_field = 'name'
     permission_classes = [permissions.AllowAny]
     pagination_class = PageNumberSetPagination
@@ -23,10 +23,12 @@ class TagViewSet(viewsets.ModelViewSet):
 # '$' Regex search.
 
 class PostViewSet(viewsets.ModelViewSet):
-    search_fields = ['content', 'h1', 'tags']
-    filter_backends = (filters.SearchFilter,)
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    ordering_fields = ['id', 'slug']
+    search_fields = ['description', 'h1', 'tags__name', 'title']
+    filter_fields = ['description', 'h1', 'tags__name', 'title']
+    queryset = Post.objects.all().order_by('id')
     lookup_field = 'slug'
     permission_classes = [permissions.AllowAny]
     pagination_class = PageNumberSetPagination
@@ -88,12 +90,15 @@ class ProfileView(generics.GenericAPIView):
 class CommentView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        post_slug = self.kwargs['post_slug'].lower()
-        post = Post.objects.get(slug=post_slug)
-        return Comment.objects.filter(post=post)
+        if 'post_slug' in self.kwargs:
+            post_slug = self.kwargs['post_slug'].lower()
+            post = Post.objects.get(slug=post_slug)
+            return Comment.objects.filter(post=post)
+        else:
+            return Comment.objects.all()
 
 
 class CommentDeleteView(generics.GenericAPIView):
