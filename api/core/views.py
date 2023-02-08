@@ -26,8 +26,8 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ['id', 'slug']
-    search_fields = ['description', 'h1', 'tags__name', 'title']
-    filter_fields = ['description', 'h1', 'tags__name', 'title']
+    search_fields = ['description', 'h1', 'tags__name', 'title','content', 'author__username']
+    filter_fields = ['h1', 'tags__name', 'title']
     queryset = Post.objects.all().order_by('id')
     lookup_field = 'slug'
     permission_classes = [permissions.AllowAny]
