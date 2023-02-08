@@ -55,7 +55,7 @@ class FeedBackViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def perform_create(self, serializer):
-        serializer.save(serializer)
+        serializer.save()
 
         # data = serializer.validated_data
         # name = data.get('name')
